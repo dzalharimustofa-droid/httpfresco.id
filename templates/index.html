@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>FrescoFruits - Toko Buah Segar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo"><i class="fas fa-leaf"></i> Fresco<span>Fruits</span></div>
+        <button id="menu-toggle" class="menu-toggle" aria-label="Buka menu"><i class="fas fa-bars"></i></button>
+        <nav class="main-nav">
+            <button id="menu-close" class="menu-close" aria-label="Tutup menu"><i class="fas fa-times"></i></button>
+            <ul>
+                <li><a href="#shop">Belanja</a></li>
+                <li><a href="#new-arrivals">Produk Baru</a></li>
+                <li><a href="#bestsellers">Terlaris</a></li>
+                <li><a href="#deals">Promo</a></li>
+                <li><a href="#blog">Blog</a></li>
+                <li><a href="/checkout">Checkout</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+            <div class="mobile-nav-actions">
+                <div class="mobile-search-bar">
+                    <input id="mobile-search-input" type="text" placeholder="Cari produk..." aria-label="Cari produk">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="mobile-action-buttons">
+                    <button class="mobile-header-icon" type="button"><i class="far fa-user"></i> Akun</button>
+                    <button id="mobile-cart-button" class="mobile-header-icon mobile-cart-button" type="button"><i class="fas fa-shopping-cart"></i><span id="mobile-cart-count">0</span> Keranjang</button>
+                </div>
+            </div>
+        </nav>
+        <div class="header-icons">
+            <div class="search-bar"><input id="search-input" type="text" placeholder="Cari produk..." aria-label="Cari produk"><i class="fas fa-search"></i></div>
+            <button class="header-icon" title="Akun"><i class="far fa-user"></i></button>
+            <button id="cart-button" class="header-icon cart-button" title="Keranjang"><i class="fas fa-shopping-cart"></i><span id="cart-count">0</span></button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Buah Segar Pilihan Langsung ke Depan Pintu Anda.</h1>
+                <button class="btn-shop" id="btn-shop">BELANJA SEKARANG</button>
+            </div>
+        </section>
+
+        <section class="top-picks-section" id="top-picks">
+            <div class="section-header">
+                <h2>Pilihan Terbaik</h2>
+                <a href="#shop" class="see-all">Lihat Semua Produk</a>
+            </div>
+            <div class="product-grid">
+                {% for p in top_picks %}
+                <div class="product-card" data-name="{{ p.name }}" data-price="{{ p.price }}" data-unit="{{ p.unit }}" data-tags="{% if p.is_new_arrival %}new-arrival {% endif %}{% if p.is_bestseller %}bestseller {% endif %}{% if p.is_deal %}deal {% endif %}">
+                    <img src="{{ p.image_url }}" alt="{{ p.name }}">
+                    <p class="category">{{ p.category }}</p>
+                    <h4>{{ p.name }}</h4>
+                    <p class="price">{{ p.price|rupiah }}/{{ p.unit }}</p>
+                    <div class="product-actions">
+                        <button class="btn-add btn-base btn-primary">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="seasonal-section" id="seasonal">
+            <div class="section-header">
+                <h2>Favorit Musiman</h2>
+                <a href="#shop" class="see-all">Lihat Semua Produk</a>
+            </div>
+            <div class="product-grid">
+                {% for p in seasonal %}
+                <div class="product-card" data-name="{{ p.name }}" data-price="{{ p.price }}" data-unit="{{ p.unit }}" data-tags="{% if p.is_new_arrival %}new-arrival {% endif %}{% if p.is_bestseller %}bestseller {% endif %}{% if p.is_deal %}deal {% endif %}">
+                    <img src="{{ p.image_url }}" alt="{{ p.name }}">
+                    <p class="category">{{ p.category }}</p>
+                    <h4>{{ p.name }}</h4>
+                    <p class="price">{{ p.price|rupiah }}/{{ p.unit }}</p>
+                    <div class="product-actions">
+                        <button class="btn-add btn-base btn-primary">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <h3>Filter Produk</h3>
+                <ul class="filter-list">
+                    <li><input type="checkbox" id="filter-shop" data-filter="all" checked> <label for="filter-shop">Semua Produk</label></li>
+                    <li><input type="checkbox" id="filter-new" data-filter="new-arrival"> <label for="filter-new">Produk Baru</label></li>
+                    <li><input type="checkbox" id="filter-best" data-filter="bestseller"> <label for="filter-best">Terlaris</label></li>
+                    <li><input type="checkbox" id="filter-deals" data-filter="deal"> <label for="filter-deals">Promo</label></li>
+                </ul>
+                <h3>Harga</h3>
+                <input type="range" min="0" max="150000" value="150000" id="price-range">
+                <p id="price-value">Rp0 - Rp150.000</p>
+            </aside>
+
+            <div class="main-content">
+            <section class="shop-section" id="shop">
+            <div class="section-header">
+                <h2>Belanja Buah Segar</h2>
+                <a href="#" class="see-all">Lihat Semua Produk</a>
+            </div>
+            
+            <div class="product-grid">
+                {% for p in products %}
+                <div class="product-card" data-name="{{ p.name }}" data-price="{{ p.price }}" data-unit="{{ p.unit }}" data-tags="{% if p.is_new_arrival %}new-arrival {% endif %}{% if p.is_bestseller %}bestseller {% endif %}{% if p.is_deal %}deal {% endif %}">
+                    <img src="{{ p.image_url }}" alt="{{ p.name }}">
+                    <p class="category">{{ p.category }}</p>
+                    <h4>{{ p.name }}</h4>
+                    <p class="price">{{ p.price|rupiah }}/{{ p.unit }}</p>
+                    <div class="product-actions">
+                        <button class="btn-add btn-base btn-primary">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="new-arrivals-section" id="new-arrivals">
+            <div class="section-header">
+                <h2>Produk Baru</h2>
+                <a href="#" class="see-all">Lihat Semua</a>
+            </div>
+            <div class="product-grid">
+                {% for p in new_arrivals %}
+                <div class="product-card" data-name="{{ p.name }}" data-price="{{ p.price }}" data-unit="{{ p.unit }}" data-tags="{% if p.is_new_arrival %}new-arrival {% endif %}{% if p.is_bestseller %}bestseller {% endif %}{% if p.is_deal %}deal {% endif %}">
+                    <img src="{{ p.image_url }}" alt="{{ p.name }}">
+                    <p class="category">{{ p.category }}</p>
+                    <h4>{{ p.name }}</h4>
+                    <p class="price">{{ p.price|rupiah }}/{{ p.unit }}</p>
+                    <div class="product-actions">
+                        <button class="btn-add btn-base btn-primary">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="bestsellers-section" id="bestsellers">
+            <div class="section-header">
+                <h2>Terlaris</h2>
+                <a href="#" class="see-all">Lihat Semua</a>
+            </div>
+            <div class="product-grid">
+                {% for p in bestsellers %}
+                <div class="product-card" data-name="{{ p.name }}" data-price="{{ p.price }}" data-unit="{{ p.unit }}" data-tags="{% if p.is_new_arrival %}new-arrival {% endif %}{% if p.is_bestseller %}bestseller {% endif %}{% if p.is_deal %}deal {% endif %}">
+                    <img src="{{ p.image_url }}" alt="{{ p.name }}">
+                    <p class="category">{{ p.category }}</p>
+                    <h4>{{ p.name }}</h4>
+                    <p class="price">{{ p.price|rupiah }}/{{ p.unit }}</p>
+                    <div class="product-actions">
+                        <button class="btn-add btn-base btn-primary">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="deals-section" id="deals">
+            <div class="section-header">
+                <h2>Promo</h2>
+                <a href="#" class="see-all">Lihat Semua</a>
+            </div>
+            <div class="product-grid">
+                {% for p in deals %}
+                <div class="product-card" data-name="{{ p.name }}" data-price="{{ p.price }}" data-unit="{{ p.unit }}" data-tags="{% if p.is_new_arrival %}new-arrival {% endif %}{% if p.is_bestseller %}bestseller {% endif %}{% if p.is_deal %}deal {% endif %}">
+                    <img src="{{ p.image_url }}" alt="{{ p.name }}">
+                    <p class="category">{{ p.category }}</p>
+                    <h4>{{ p.name }}</h4>
+                    <p class="price">{{ p.price|rupiah }}/{{ p.unit }}</p>
+                    <div class="product-actions">
+                        <button class="btn-add btn-base btn-primary">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="blog-section" id="blog">
+            <div class="section-header">
+                <h2>Blog</h2>
+                <a href="#" class="see-all">Lihat Semua</a>
+            </div>
+            <div class="blog-grid" role="list">
+                <article class="blog-card" role="listitem">
+                    <div class="blog-media">
+                        <img
+                            src="https://images.unsplash.com/photo-1571771019784-3ff35f4f4277?q=80&w=800&auto=format&fit=crop"
+                            alt="Healthy Eating"
+                            loading="lazy"
+                        >
+                        <div class="blog-media-overlay" aria-hidden="true"></div>
+                    </div>
+
+                    <div class="blog-body">
+                        <div class="blog-meta">
+                            <span class="blog-pill pill-trend"><i class="fas fa-leaf"></i> Kesehatan</span>
+                            <span class="blog-meta-item"><i class="far fa-clock"></i> 6 menit baca</span>
+                        </div>
+                        <h4>10 Tips Makan Buah Sehat Setiap Hari</h4>
+                        <p>Pelajari cara mengintegrasikan buah-buahan segar ke dalam diet harian Anda untuk kesehatan optimal.</p>
+                        <a href="#" class="read-more"><span>Baca Selengkapnya</span> <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="blog-card" role="listitem">
+                    <div class="blog-media">
+                        <img
+                            src="https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?q=80&w=800&auto=format&fit=crop"
+                            alt="Organic Farming"
+                            loading="lazy"
+                        >
+                        <div class="blog-media-overlay" aria-hidden="true"></div>
+                    </div>
+
+                    <div class="blog-body">
+                        <div class="blog-meta">
+                            <span class="blog-pill pill-organic"><i class="fas fa-seedling"></i> Organik</span>
+                            <span class="blog-meta-item"><i class="far fa-clock"></i> 5 menit baca</span>
+                        </div>
+                        <h4>Manfaat Buah Organik untuk Kesehatan</h4>
+                        <p>Temukan mengapa buah organik lebih baik dan bagaimana memilih yang terbaik untuk keluarga Anda.</p>
+                        <a href="#" class="read-more"><span>Baca Selengkapnya</span> <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="blog-card" role="listitem">
+                    <div class="blog-media">
+                        <img
+                            src="https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=800&auto=format&fit=crop"
+                            alt="Seasonal Fruits"
+                            loading="lazy"
+                        >
+                        <div class="blog-media-overlay" aria-hidden="true"></div>
+                    </div>
+
+                    <div class="blog-body">
+                        <div class="blog-meta">
+                            <span class="blog-pill pill-season"><i class="fas fa-snowflake"></i> Musiman</span>
+                            <span class="blog-meta-item"><i class="far fa-clock"></i> 7 menit baca</span>
+                        </div>
+                        <h4>Buah Musiman: Apa yang Tersedia Saat Ini</h4>
+                        <p>Panduan lengkap buah-buahan musiman dan nutrisi yang mereka tawarkan.</p>
+                        <a href="#" class="read-more"><span>Baca Selengkapnya</span> <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-grid">
+
+                <!-- Customer Service -->
+                <div class="footer-section">
+                    <div class="footer-header">
+                        <i class="fas fa-headset"></i>
+                        <h4>Customer Service</h4>
+                    </div>
+                    <ul class="footer-list">
+                        <li><a href="#"><i class="fas fa-phone"></i> Call Us: +62 812-3456-7890</a></li>
+                        <li><a href="#"><i class="fas fa-envelope"></i> Email: support@frescofruits.com</a></li>
+                        <li><a href="#"><i class="fas fa-clock"></i> Jam Operasional: 08:00 - 20:00</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> Lokasi</a></li>
+                    </ul>
+                </div>
+
+                <!-- About Us -->
+                <div class="footer-section">
+                    <div class="footer-header">
+                        <i class="fas fa-info-circle"></i>
+                        <h4>About Us</h4>
+                    </div>
+                    <ul class="footer-list">
+                        <li><a href="#"><i class="fas fa-leaf"></i> Tentang Fresco Fruits</a></li>
+                        <li><a href="#"><i class="fas fa-history"></i> Sejarah Kami</a></li>
+                        <li><a href="#"><i class="fas fa-briefcase"></i> Karir</a></li>
+                        <li><a href="#"><i class="fas fa-handshake"></i> Kemitraan</a></li>
+                    </ul>
+                </div>
+
+                <!-- Follow Us -->
+                <div class="footer-section">
+                    <div class="footer-header">
+                        <i class="fas fa-share-alt"></i>
+                        <h4>Follow Us</h4>
+                    </div>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/frescofruits?igsh=MXgwZW93a2Eyb241YQ==" target="_blank" class="social-btn" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                            <span>Instagram</span>
+                        </a>
+                        <a href="#" class="social-btn" title="Facebook">
+                            <i class="fab fa-facebook"></i>
+                            <span>Facebook</span>
+                        </a>
+                        <a href="#" class="social-btn" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                            <span>Twitter</span>
+                        </a>
+                        <a href="#" class="social-btn" title="TikTok">
+                            <i class="fab fa-tiktok"></i>
+                            <span>TikTok</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="footer-section">
+                    <div class="footer-header">
+                        <i class="fas fa-envelope-open"></i>
+                        <h4>Newsletter</h4>
+                    </div>
+                    <p class="newsletter-desc">Dapatkan penawaran eksklusif dan tips kesehatan langsung ke inbox Anda</p>
+                    <div class="newsletter-form">
+                        <input type="email" placeholder="Masukkan email Anda..." class="newsletter-input">
+                        <button class="newsletter-btn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <p class="newsletter-note">Kami tidak akan pernah membagikan email Anda</p>
+                </div>
+
+                <!-- Payments -->
+                <div class="footer-section">
+                    <div class="footer-header">
+                        <i class="fas fa-credit-card"></i>
+                        <h4>Metode Pembayaran</h4>
+                    </div>
+                    <div class="payment-grid">
+                        <button class="payment-btn-footer" onclick="showPaymentModal('BCA', '1234 5678 9012')" title="BCA">
+                            <i class="fas fa-university"></i>
+                            <span>BCA</span>
+                        </button>
+                        <button class="payment-btn-footer" onclick="showPaymentModal('Mandiri', '9876 5432 1098')" title="Mandiri">
+                            <i class="fas fa-university"></i>
+                            <span>Mandiri</span>
+                        </button>
+                        <button class="payment-btn-footer" onclick="showPaymentModal('BRI', '5555 6666 7777')" title="BRI">
+                            <i class="fas fa-university"></i>
+                            <span>BRI</span>
+                        </button>
+                        <button class="payment-btn-footer" onclick="showPaymentModal('BNI', '1111 2222 3333')" title="BNI">
+                            <i class="fas fa-university"></i>
+                            <span>BNI</span>
+                        </button>
+                        <button class="payment-btn-footer qris-btn-footer" onclick="showQRISModal()" title="QRIS">
+                            <i class="fas fa-qrcode"></i>
+                            <span>QRIS</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+&copy; 2026 Fresco Fruits. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="payment-modal">
+        <div class="payment-modal-content">
+            <span class="payment-close" onclick="closePaymentModal()">&times;</span>
+            <h3 id="paymentBankName"></h3>
+            <p>Nomor Rekening:</p>
+            <div class="payment-account-box">
+                <p id="paymentAccountNo"></p>
+                <button onclick="copyToClipboard()" class="copy-btn">Copy</button>
+            </div>
+            <p class="payment-note">Silakan transfer sesuai nominal yang tertera</p>
+        </div>
+    </div>
+
+    <!-- QRIS Modal -->
+    <div id="qrisModal" class="payment-modal">
+        <div class="payment-modal-content qris-modal-content">
+            <span class="payment-close" onclick="closeQRISModal()">&times;</span>
+            <h3>Pembayaran via QRIS</h3>
+            <p class="qris-subtitle">Scan QR Code dengan aplikasi pembayaran Anda</p>
+            <div class="qris-code-container">
+                <img src="qris.jpeg" alt="QRIS Code" class="qris-image">
+            </div>
+            <p class="payment-note">Pastikan untuk melakukan pembayaran sesuai nominal yang diminta</p>
+        </div>
+    </div>
+
+
+
+    <!-- Cart Modal -->
+    <div id="nav-backdrop" class="nav-backdrop"></div>
+    <div id="cartModal" class="payment-modal">
+        <div class="payment-modal-content">
+            <span class="payment-close" onclick="closeCartModal()">&times;</span>
+            <h3>Keranjang Belanja</h3>
+            <div id="cart-items" class="cart-items"></div>
+            <div class="cart-summary">
+                <p>Total:</p>
+                <p id="cart-total">Rp0</p>
+            </div>
+            <a href="/checkout" class="btn-buy btn-base cart-modal-checkout">Lanjut ke Checkout</a>
+
+        </div>
+    </div>
+
+<script src="{{ url_for('static', filename='index.js') }}" defer></script>
+
+</body>
+</html>

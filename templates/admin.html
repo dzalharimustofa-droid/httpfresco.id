@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - FrescoFruits</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+
+</head>
+<body>
+    <!-- Animated fruit background (pure CSS) -->
+    <div class="admin-bg-anim" aria-hidden="true">
+        <div class="fruit f1" style="background-image: url('https://pngimg.com/uploads/strawberry/strawberry_PNG2598.png')"></div>
+        <div class="fruit f2" style="background-image: url('https://pngimg.com/uploads/apple/apple_PNG12439.png')"></div>
+        <div class="fruit f3" style="background-image: url('https://pngimg.com/uploads/avocado/avocado_PNG15501.png')"></div>
+        <div class="fruit f4" style="background-image: url('https://pngimg.com/uploads/mango/mango_PNG9187.png')"></div>
+        <div class="fruit f5" style="background-image: url('https://pngimg.com/uploads/banana/banana_PNG846.png')"></div>
+        <div class="fruit f6" style="background-image: url('https://pngimg.com/uploads/orange/orange_PNG791.png')"></div>
+    </div>
+    <div class="admin-header">
+        <div>
+            <h1><i class="fas fa-leaf" style="color: #4CAF50; margin-right: 10px;"></i>Panel Admin FrescoFruits</h1>
+        </div>
+        <a href="/admin/logout" class="admin-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <main class="container admin-content">
+        <!-- Dashboard Stats -->
+        <div class="dashboard-grid">
+            <div class="stat-card revenue">
+                <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <div class="stat-value">{{ (total_revenue|int|string) if total_revenue else '0' }}</div>
+                <div class="stat-label">Total Penjualan</div>
+            </div>
+            <div class="stat-card orders">
+                <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+                <div class="stat-value">{{ total_orders }}</div>
+                <div class="stat-label">Total Pesanan</div>
+            </div>
+            <div class="stat-card products">
+                <div class="stat-icon"><i class="fas fa-box"></i></div>
+                <div class="stat-value">{{ products|length }}</div>
+                <div class="stat-label">Total Produk</div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <button class="tab active" data-tab="pesanan"><i class="fas fa-list"></i> Pesanan Terbaru</button>
+            <button class="tab" data-tab="produk"><i class="fas fa-box"></i> Kelola Produk</button>
+        </div>
+
+        <!-- Tab: Pesanan -->
+        <div id="pesanan" class="tab-content active">
+            <div class="section">
+                <h3><i class="fas fa-list"></i> Daftar Pesanan Terbaru</h3>
+                {% if orders %}
+                <div class="table-scroll-x">
+                    <table class="orders-table">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama Pelanggan</th>
+                            <th>Email</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Tanggal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td><strong>{{ order.order_name }}</strong></td>
+                            <td>{{ order.order_email }}</td>
+                            <td><strong>{{ order.total_price|rupiah }}</strong></td>
+                            <td><span class="status-badge status-pending">{{ order.status }}</span></td>
+                            <td>{{ order.created_at[:10] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>Belum ada pesanan</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tab: Produk -->
+        <div id="produk" class="tab-content">
+            <!-- Form Tambah/Edit Produk -->
+            <div class="section">
+                <h3><i class="fas fa-plus"></i> {{ 'Edit Produk' if product_to_edit else 'Tambah Produk Baru' }}</h3>
+                <form method="post" action="/admin">
+                    <input type="hidden" name="product_id" value="{{ product_to_edit.id if product_to_edit else '' }}">
+                    <div class="product-form">
+                        <input type="text" name="name" required value="{{ product_to_edit.name if product_to_edit else '' }}" class="checkout-input" placeholder="Nama Produk">
+                        <input type="text" name="category" required value="{{ product_to_edit.category if product_to_edit else '' }}" class="checkout-input" placeholder="Kategori">
+                        <input type="number" name="price" required step="0.01" min="0" value="{{ product_to_edit.price if product_to_edit else '' }}" class="checkout-input" placeholder="Harga">
+                        <input type="text" name="unit" required value="{{ product_to_edit.unit if product_to_edit else 'pcs' }}" class="checkout-input" placeholder="Satuan">
+                        <input type="url" name="image_url" value="{{ product_to_edit.image_url if product_to_edit else '' }}" class="checkout-input" placeholder="URL Gambar">
+                    </div>
+                    <div class="admin-flags">
+                        <label class="admin-flag"><input type="checkbox" name="is_top_pick" {% if product_to_edit and product_to_edit.is_top_pick %}checked{% endif %}> Top Pick</label>
+                        <label class="admin-flag"><input type="checkbox" name="is_seasonal" {% if product_to_edit and product_to_edit.is_seasonal %}checked{% endif %}> Musiman</label>
+                        <label class="admin-flag"><input type="checkbox" name="is_new_arrival" {% if product_to_edit and product_to_edit.is_new_arrival %}checked{% endif %}> Baru</label>
+                        <label class="admin-flag"><input type="checkbox" name="is_bestseller" {% if product_to_edit and product_to_edit.is_bestseller %}checked{% endif %}> Terlaris</label>
+                        <label class="admin-flag"><input type="checkbox" name="is_deal" {% if product_to_edit and product_to_edit.is_deal %}checked{% endif %}> Promo</label>
+                    </div>
+                    <div class="admin-form-actions">
+                        <button type="submit" class="btn-save btn-base btn-primary"><i class="fas fa-save"></i> {{ 'Update' if product_to_edit else 'Simpan' }} Produk</button>
+                        {% if product_to_edit %}<a href="/admin" class="admin-cancel"><i class="fas fa-times-circle"></i> Batal</a>{% endif %}
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Daftar Produk -->
+            <div class="section">
+                <h3><i class="fas fa-box"></i> Daftar Produk ({{ products|length }})</h3>
+                {% if products %}
+                <div class="product-list">
+                    {% for p in products %}
+                    <div class="product-item">
+                        <img src="{{ p.image_url }}" alt="{{ p.name }}">
+                        <h4>{{ p.name }}</h4>
+                        <p>{{ p.category }} • {{ p.price|rupiah }}/{{ p.unit }}</p>
+                        <div class="admin-tags">
+                            {% if p.is_top_pick %}<span class="admin-tag admin-tag-top">Top Pick</span>{% endif %}
+                            {% if p.is_deal %}<span class="admin-tag admin-tag-deal">Promo</span>{% endif %}
+                            {% if p.is_bestseller %}<span class="admin-tag admin-tag-best">Terlaris</span>{% endif %}
+                        </div>
+                        <div class="product-actions">
+                            <a href="/admin?edit={{ p.id }}" class="btn-edit btn-base btn-secondary"><i class="fas fa-edit"></i> Edit</a>
+                            <form action="/admin/delete/{{ p.id }}" method="post" class="delete-form">
+                                <button type="submit" class="btn-delete btn-base btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <p>Belum ada produk</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='admin.js') }}" defer></script>
+</body>
+</html>
+
+

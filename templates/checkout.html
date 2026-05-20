@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - FrescoFruits</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo"><i class="fas fa-leaf"></i> Fresco<span>Fruits</span></div>
+        <nav>
+            <ul>
+                <li><a href="/">Beranda</a></li>
+                <li><a href="/checkout">Checkout</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="container">
+        <section class="shop-section checkout-page">
+
+            <div class="section-header">
+                <h2>Checkout</h2>
+                <a href="/" class="see-all">Kembali ke Toko</a>
+            </div>
+            <div class="content-wrapper checkout-grid">
+                <div class="card-surface">
+
+                    <h3>Detail Pesanan</h3>
+                    <form id="checkout-form" method="post" action="/checkout/submit">
+                        <input type="hidden" name="cart_data" id="cart_data">
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" name="order_name" required placeholder="Masukkan nama lengkap" class="checkout-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="order_email" required placeholder="Masukkan email" class="checkout-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor Telepon</label>
+                            <input type="tel" name="order_phone" required placeholder="Masukkan nomor telepon" class="checkout-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Alamat Pengiriman</label>
+                            <textarea name="order_address" required placeholder="Masukkan alamat lengkap" class="checkout-input" rows="5"></textarea>
+                        </div>
+                        <button type="submit" class="btn-buy btn-base">Bayar Sekarang</button>
+                    </form>
+                </div>
+                <div class="card-surface">
+
+                    <h3>Ringkasan Keranjang</h3>
+                    <div id="checkout-items"></div>
+                    <div class="cart-summary checkout-total-summary">
+                        <span>Total:</span>
+                        <span id="checkout-total">Rp0</span>
+                    </div>
+                    <p class="muted checkout-page-note">Pesanan akan dikonfirmasi setelah Anda mengisi data dan menekan tombol Bayar Sekarang.</p>
+
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="{{ url_for('static', filename='checkout.js') }}" defer></script>
+</body>
+</html>
+

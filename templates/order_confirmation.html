@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konfirmasi Pesanan - FrescoFruits</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo"><i class="fas fa-leaf"></i> Fresco<span>Fruits</span></div>
+        <nav>
+            <ul>
+                <li><a href="/">Beranda</a></li>
+                <li><a href="/checkout">Checkout</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="shop-section order-confirm-page">
+
+            <div class="section-header">
+                <h2>Pesanan Diterima</h2>
+                <a href="/" class="see-all">Kembali ke Toko</a>
+            </div>
+
+            <div class="order-confirm-card">
+                <h3>Terima kasih, {{ order_name }}!</h3>
+                <p>Pemesanan Anda telah diterima dan sedang diproses.</p>
+
+                <div class="order-confirm-meta">
+                    <p><strong>Email:</strong> {{ order_email }}</p>
+                    <p><strong>Telepon:</strong> {{ order_phone }}</p>
+                    <p><strong>Alamat:</strong> {{ order_address }}</p>
+                </div>
+
+                <div class="order-confirm-summary">
+                    <h4>Ringkasan Pesanan</h4>
+                    <div id="confirmation-items"></div>
+                    <div class="cart-summary order-confirm-total">
+                        <span>Total Pesanan:</span>
+                        <span id="confirmation-total">Rp0</span>
+                    </div>
+                </div>
+
+                <p class="order-confirm-note">
+                    Silakan cek email Anda untuk detail lebih lanjut. Hubungi kami jika Anda membutuhkan bantuan.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script type="application/json" id="__CART_DATA__">{{ cart_data|tojson | safe }}</script>
+
+    <script src="{{ url_for('static', filename='order_confirmation.js') }}" defer></script>
+</body>
+</html>
+
